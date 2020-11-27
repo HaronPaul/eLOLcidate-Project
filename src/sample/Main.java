@@ -10,7 +10,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        Controller c = new Controller();
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        c.setStage(primaryStage);
         primaryStage.setTitle("LOL Code Interpreter");
         primaryStage.setScene(new Scene(root, 1280, 800));
         primaryStage.show();
