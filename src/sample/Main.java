@@ -15,6 +15,7 @@ public class Main extends Application {
         c.setStage(primaryStage);
         primaryStage.setTitle("LOL Code Interpreter");
         primaryStage.setScene(new Scene(root, 1280, 800));
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
