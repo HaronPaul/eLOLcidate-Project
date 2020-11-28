@@ -35,12 +35,19 @@ public class Controller {
         lexer.setCodePane(codePane);
         FileChooser fc = new FileChooser();
         fc.setTitle("Open LOLCode file");
+
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("LOL files (*.lol)", "*.lol");
+        fc.getExtensionFilters().add(extFilter);
+
         // Opens a new window
         File selectedFile = fc.showOpenDialog(stage);
 
         // Passing the LOL code to the lexer
-        lexer.setLolFile(selectedFile);
-        lexer.readLines();
+        if(selectedFile != null) {
+            codePane.getChildren().clear();
+            lexer.setLolFile(selectedFile);
+            lexer.readLines();
+        }
     }
 
     // This references the stage from the main class
