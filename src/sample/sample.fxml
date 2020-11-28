@@ -1,55 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<VBox fx:id="vbox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<!--<VBox fx:id="vbox" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0">-->
+
+<AnchorPane fx:id="anchpane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <children>
-      <HBox prefHeight="54.0" prefWidth="1280.0">
+      <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Button fx:id="loader" mnemonicParsing="false" onAction="#openLOLFile" prefHeight="30.0" prefWidth="492.0" text="Load file..." />
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="LEXEMES" textAlignment="CENTER" wrappingWidth="373.9830722808838">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="SYMBOL TABLE" textAlignment="CENTER" wrappingWidth="415.9830722808838">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Text>
+             <HBox alignment="CENTER">
+                 <children>
+                  <VBox>
+                     <children>
+                           <Button fx:id="loader" contentDisplay="CENTER" mnemonicParsing="false" onAction="#openLOLFile" prefHeight="30.0" prefWidth="492.0" text="Load file..." />
+                        <ScrollPane prefHeight="458.0" prefWidth="492.0">
+                           <content>
+                                 <TextFlow fx:id="codePane" prefHeight="458.0" />
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <children>
+                           <Text strokeType="OUTSIDE" strokeWidth="0.0" text="LEXEMES" textAlignment="CENTER" wrappingWidth="413.98313331604004">
+                               <font>
+                                   <Font size="18.0" />
+                               </font>
+                           </Text>
+                           <TableView prefHeight="464.0" prefWidth="414.0">
+                               <columns>
+                                   <TableColumn prefWidth="75.0" text="Lexeme" />
+                                   <TableColumn prefWidth="75.0" text="Classification" />
+                               </columns>
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                </columnResizePolicy>
+                           </TableView>
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <children>
+                           <Text strokeType="OUTSIDE" strokeWidth="0.0" text="SYMBOL TABLE" textAlignment="CENTER" wrappingWidth="415.9830722808838">
+                               <font>
+                                   <Font size="18.0" />
+                               </font>
+                           </Text>
+                           <TableView prefHeight="464.0" prefWidth="414.0">
+                               <columns>
+                                   <TableColumn prefWidth="113.0" text="Identifier" />
+                                   <TableColumn prefWidth="117.0" text="Value" />
+                               </columns>
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                </columnResizePolicy>
+                           </TableView>
+                     </children>
+                  </VBox>
+                 </children>
+             </HBox>
+            <HBox alignment="CENTER">
+               <children>
+                  <VBox>
+                     <children>
+                         <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="1322.0" text="Execute" />
+                        <ScrollPane prefHeight="200.0" prefWidth="1322.0">
+                           <content>
+                               <TextFlow prefHeight="200.0" />
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
          </children>
-      </HBox>
-      <HBox prefHeight="472.0" prefWidth="769.0">
-         <children>
-            <TextFlow fx:id="codePane" prefHeight="464.0" prefWidth="505.0" />
-            <TableView prefHeight="464.0" prefWidth="399.0">
-              <columns>
-                <TableColumn prefWidth="75.0" text="Lexeme" />
-                <TableColumn prefWidth="75.0" text="Classification" />
-              </columns>
-               <columnResizePolicy>
-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-               </columnResizePolicy>
-            </TableView>
-            <TableView prefHeight="464.0" prefWidth="414.0">
-              <columns>
-                <TableColumn prefWidth="113.0" text="Identifier" />
-                <TableColumn prefWidth="117.0" text="Value" />
-              </columns>
-               <columnResizePolicy>
-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-               </columnResizePolicy>
-            </TableView>
-         </children>
-      </HBox>
-      <Button mnemonicParsing="false" prefHeight="61.0" prefWidth="1280.0" text="Execute" />
-      <TextFlow prefHeight="309.0" prefWidth="927.0" />
+      </VBox>
    </children>
-</VBox>
+</AnchorPane>
