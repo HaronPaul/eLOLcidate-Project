@@ -1,8 +1,7 @@
 package sample;
 
 import javafx.fxml.FXML;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
+import javafx.scene.control.TextArea;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,7 +15,7 @@ public class Lexer {
     File lolFile;
     ArrayList<String> keywords; // This is where the keywords are stored
     ArrayList<String> identifiers;
-    TextFlow codePane;
+    TextArea codePane;
 
     // Constructor for Lexer class
     public Lexer() {
@@ -31,10 +30,9 @@ public class Lexer {
             String line = reader.readLine();
             while(line != null) {
 
-                // Creates a Text object. The text object is then added to the
-                // Textflow object
-                Text t = new Text(line + "\n");
-                codePane.getChildren().add(t);
+                // Creates a string
+                String t = line + "\n";
+                codePane.appendText(t);
 
                 // When line is blank (No statements), it will just continue to next line
                 if(line.length() == 0) {
@@ -58,7 +56,7 @@ public class Lexer {
         Pattern keyword = Pattern.compile("(^I|[\\t\\s]I)\\sHAS\\s(A$|A\\b)|(^K|[\\t\\s]K)THXBY(E$|E\\b)");
         Matcher m = keyword.matcher(line);
         while(m.find()) {
-            String matched = m.group();
+            String matched = m.group().trim();
             System.out.println(matched);
         }
     }
@@ -69,7 +67,7 @@ public class Lexer {
         this.lolFile = file;
     }
 
-    void setCodePane(TextFlow tf) {
+    void setCodePane(TextArea tf) {
         this.codePane = tf;
     }
 

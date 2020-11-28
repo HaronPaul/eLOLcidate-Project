@@ -3,7 +3,7 @@ package sample;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextFlow;
+import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -25,7 +25,7 @@ public class Controller {
     private Button loader;
 
     @FXML
-    private TextFlow codePane;
+    private TextArea codePane;
 
     // When load button is clicked, it will open a new windows
     // and lets the user choose a lol code file
@@ -36,6 +36,7 @@ public class Controller {
         FileChooser fc = new FileChooser();
         fc.setTitle("Open LOLCode file");
 
+        // For the extension filter
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("LOL files (*.lol)", "*.lol");
         fc.getExtensionFilters().add(extFilter);
 
@@ -44,7 +45,7 @@ public class Controller {
 
         // Passing the LOL code to the lexer
         if(selectedFile != null) {
-            codePane.getChildren().clear();
+            codePane.clear();
             lexer.setLolFile(selectedFile);
             lexer.readLines();
         }
