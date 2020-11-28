@@ -55,10 +55,10 @@ public class Lexer {
     // Regex part. This is where the keywords, strings,
     // and identifiers are matched
     void matchStrings(String line) {
-        Pattern keyword = Pattern.compile("(^I|[\\t\\s]I)\\sHAS\\s(A$|A\\b)|(^K|[\\t\\s]K)THXBY(E$|E\\b)");
+        Pattern keyword = Pattern.compile("(^I|[\\t\\s]I)\\sHAS\\s(A$|A\\b)|(^K|[\\t\\s]K)THXBY(E$|E\\b)|(^V|[\\t\\s]V)ISIBL(E$|E\\b)|(^G|[\\t\\s]G)IMME(H$|H\\b)|(^B|[\\t\\s]B)T(W$|W\\b)|(^H|[\\t\\s]H)A(I$|I\\b)|(^Q|[\\t\\s]Q)UOSHUNT\\sO(F$|F\\b)|(^P|[\\t\\s]P)RODUKT\\sO(F$|F\\b)");
         Matcher m = keyword.matcher(line);
         while(m.find()) {
-            String matched = m.group();
+            String matched = m.group().trim();
             System.out.println(matched);
         }
     }
@@ -72,6 +72,5 @@ public class Lexer {
     void setCodePane(TextFlow tf) {
         this.codePane = tf;
     }
-
 
 }

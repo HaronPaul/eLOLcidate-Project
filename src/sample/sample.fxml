@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
@@ -26,10 +27,14 @@
             </Text>
          </children>
       </HBox>
-      <HBox prefHeight="472.0" prefWidth="769.0">
+      <HBox prefHeight="473.0" prefWidth="1280.0">
          <children>
-            <TextFlow fx:id="codePane" prefHeight="464.0" prefWidth="505.0" />
-            <TableView prefHeight="464.0" prefWidth="399.0">
+            <ScrollPane prefHeight="448.0" prefWidth="509.0">
+               <content>
+                  <TextFlow fx:id="codePane" prefHeight="464.0" prefWidth="505.0" />
+               </content>
+            </ScrollPane>
+            <TableView prefHeight="448.0" prefWidth="415.0">
               <columns>
                 <TableColumn prefWidth="75.0" text="Lexeme" />
                 <TableColumn prefWidth="75.0" text="Classification" />
@@ -38,7 +43,7 @@
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>
             </TableView>
-            <TableView prefHeight="464.0" prefWidth="414.0">
+            <TableView prefHeight="448.0" prefWidth="380.0">
               <columns>
                 <TableColumn prefWidth="113.0" text="Identifier" />
                 <TableColumn prefWidth="117.0" text="Value" />
@@ -50,6 +55,6 @@
          </children>
       </HBox>
       <Button mnemonicParsing="false" prefHeight="61.0" prefWidth="1280.0" text="Execute" />
-      <TextFlow prefHeight="309.0" prefWidth="927.0" />
+      <TextFlow prefHeight="311.0" prefWidth="1280.0" />
    </children>
 </VBox>

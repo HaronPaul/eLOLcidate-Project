@@ -32,6 +32,7 @@ public class Controller {
     @FXML
     public void openLOLFile() {
         // For choosing the file
+        codePane.getChildren().clear();
         lexer.setCodePane(codePane);
         FileChooser fc = new FileChooser();
         fc.setTitle("Open LOLCode file");
