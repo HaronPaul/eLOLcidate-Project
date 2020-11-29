@@ -1,5 +1,6 @@
 package sample;
 
+//for lexemes table
 public class Token {
     String lexeme;
     String type;

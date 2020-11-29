@@ -3,7 +3,7 @@ package sample;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextFlow;
+import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -25,24 +25,35 @@ public class Controller {
     private Button loader;
 
     @FXML
-    private TextFlow codePane;
+    private TextArea codePane;
 
     // When load button is clicked, it will open a new windows
     // and lets the user choose a lol code file
     @FXML
     public void openLOLFile() {
         // For choosing the file
-        codePane.getChildren().clear();
         lexer.setCodePane(codePane);
         FileChooser fc = new FileChooser();
         fc.setTitle("Open LOLCode file");
+
+        // For the extension filter
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("LOL files (*.lol)", "*.lol");
+        fc.getExtensionFilters().add(extFilter);
+
         // Opens a new window
         File selectedFile = fc.showOpenDialog(stage);
 
         // Passing the LOL code to the lexer
-        lexer.setLolFile(selectedFile);
-        lexer.readLines();
+        if(selectedFile != null) {
+            codePane.clear();
+            lexer.setLolFile(selectedFile);
+            lexer.readLines();
+        }
     }
+
+    //for execute button(?)
+    @FXML
+    private Button execute;
 
     // This references the stage from the main class
     public void setStage(Stage stage) {
