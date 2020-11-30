@@ -2,10 +2,12 @@ package sample;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.control.TableColumn;
 
 import java.io.File;
 
@@ -27,6 +29,14 @@ public class Controller {
     @FXML
     private TextFlow codePane;
 
+    @FXML
+    private TableView<Token> lexemeTable;
+
+    @FXML
+    private TableColumn<Token, String> lexemeCol;
+    @FXML
+    private TableColumn<Token, String> typeCol;
+
     // When load button is clicked, it will open a new windows
     // and lets the user choose a lol code file
     @FXML
@@ -39,9 +49,13 @@ public class Controller {
         // Opens a new window
         File selectedFile = fc.showOpenDialog(stage);
 
+        // Passing the table properties
+        lexer.setLexemeTable(lexemeTable, lexemeCol, typeCol);
+
         // Passing the LOL code to the lexer
         lexer.setLolFile(selectedFile);
         lexer.readLines();
+
     }
 
     // This references the stage from the main class

@@ -34,10 +34,10 @@
                   <TextFlow fx:id="codePane" prefHeight="464.0" prefWidth="505.0" />
                </content>
             </ScrollPane>
-            <TableView prefHeight="448.0" prefWidth="415.0">
+            <TableView fx:id="lexemeTable" prefHeight="448.0" prefWidth="415.0">
               <columns>
-                <TableColumn prefWidth="75.0" text="Lexeme" />
-                <TableColumn prefWidth="75.0" text="Classification" />
+                <TableColumn fx:id="lexemeCol" prefWidth="75.0" text="Lexeme" />
+                <TableColumn fx:id="typeCol" prefWidth="75.0" text="Classification" />
               </columns>
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
