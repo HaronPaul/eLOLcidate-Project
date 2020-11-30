@@ -2,8 +2,10 @@
 
 ## Write your updates here
 
-<NAME> <DATE>:
-  <File Modified> - Modifications
+[NAME] [DATE]: <br/>
+  [File Modified] - Modifications
 
-HPPL NOV30:
+<br/>
+<br/>
+HPPL NOV30: <br/>
   Lexer.java - Added some features for writing to the table (partial)
