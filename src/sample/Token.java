@@ -1,21 +1,28 @@
 package sample;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class Token {
-    private SimpleStringProperty lexeme;
-    private SimpleStringProperty type;
+    SimpleStringProperty lexeme;
+    SimpleStringProperty type;
 
-    public Token(String lex, String type) {
-        this.lexeme = new SimpleStringProperty(lex);
-        this.type = new SimpleStringProperty(type);
+    public Token() {
     }
 
-    String getLexeme() {
-        return this.lexeme.get();
+    void setLexeme(String l) {
+        this.lexeme = new SimpleStringProperty(l);
     }
 
-    String getType(){
-        return this.type.get();
+    void setType(String t) {
+        this.type = new SimpleStringProperty(t);
+    }
+
+    public StringProperty lexemeProperty() {
+        return lexeme;
+    }
+
+    public StringProperty typeProperty() {
+        return type;
     }
 }
