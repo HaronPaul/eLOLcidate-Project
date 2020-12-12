@@ -6,8 +6,10 @@ import javafx.beans.property.StringProperty;
 public class Token {
     SimpleStringProperty lexeme;
     SimpleStringProperty type;
+    int lineNum;
 
-    public Token() {
+    public Token(int lineNumber) {
+        this.lineNum = lineNumber;
     }
 
     void setLexeme(String l) {
@@ -24,5 +26,13 @@ public class Token {
 
     public StringProperty typeProperty() {
         return type;
+    }
+
+    int getLineNum() {
+        return this.lineNum;
+    }   
+
+    public String getLexeme() {
+        return lexeme.get();
     }
 }

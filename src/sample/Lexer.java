@@ -7,28 +7,29 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.FileSystemNotFoundException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Lexer {
     File lolFile;
-    ArrayList<String> keywords; // This is where the keywords are stored
-    ArrayList<String> identifiers;
     ObservableList<Token> tokens = FXCollections.observableArrayList();
+    ArrayList<Token> stringLine;
     TextArea codePane;
+    SyntaxAnalyzer syntax;
+
 
     // This is for checking if the lexeme is BTW or OBTW
     boolean isComment = false;
 
     // Constructor for Lexer class
     public Lexer() {
-        this.keywords = new ArrayList<String>();
-        this.identifiers = new ArrayList<String>();
+        this.syntax = new SyntaxAnalyzer(this.tokens);
+        this.stringLine = new ArrayList<Token>();
     }
 
     public void readLines() {
+        int lineNum = 1;
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(lolFile));
@@ -45,9 +46,12 @@ public class Lexer {
                     continue;
                 }
                 else {
-                    matchStrings(line);
+                    matchStrings(line, lineNum);
+                    this.syntax.checkSyntax(this.stringLine);
+                    stringLine.clear();
                 }
                 line = reader.readLine();
+                lineNum++;
             }
 
         } catch (IOException e){
@@ -57,7 +61,7 @@ public class Lexer {
 
     // Regex part. This is where the keywords, strings,
     // and identifiers are matched
-    void matchStrings(String line) {
+    void matchStrings(String line, int lineNum) {
         String subline = line;
 
         // Regex for the keywords
@@ -98,9 +102,11 @@ public class Lexer {
             }
 
             if(!this.isComment)
-                addLexeme(matched, "keyword");
+                addLexeme(matched, "keyword", lineNum);
         }
 
+        // If line is in comment part, it will not continue
+        // to the succeeding lines
         if(this.isComment)
             return;
 
@@ -108,15 +114,16 @@ public class Lexer {
         Matcher s = string.matcher(subline);
         while (s.find()) {
             String matchedString = s.group().trim();
-            addLexeme(matchedString, "string");
+            addLexeme(matchedString, "string", lineNum);
             subline = subline.replace(matchedString, "").trim();
         }
 
+        // Regex for variables identifier
         Pattern varident = Pattern.compile("(^[a-zA-Z]| [a-zA-Z_])[a-zA-Z0-9]*[a-zA-Z0-9]*\\b");
         Matcher v = varident.matcher(subline);
         while(v.find()) {
             String matchedId = v.group().trim();
-            addLexeme(matchedId, "id");
+            addLexeme(matchedId, "id", lineNum);
             matchedId = "\\b(" + matchedId + ")\\b";
             subline = subline.replaceAll(matchedId, "").trim();
         }
@@ -125,15 +132,14 @@ public class Lexer {
         Matcher n = number.matcher(subline);
         while(n.find()) {
             String matchedNum = n.group().trim();
-            addLexeme(matchedNum, "number");
+            addLexeme(matchedNum, "number", lineNum);
             matchedNum = "\\b" + matchedNum + "\\b";
             subline = subline.replaceAll(matchedNum, "").trim();
         }
-
     }
 
-    void addLexeme(String matched, String type) {
-        Token token = new Token();
+    void addLexeme(String matched, String type, int lineNumber) {
+        Token token = new Token(lineNumber);
         token.setLexeme(matched);
         if(type.equals("keyword")) {
             if (matched.equals("HAI") || matched.equals("KTHXBYE"))
@@ -173,11 +179,11 @@ public class Lexer {
             }
         }
         else if(type.equals("string")) {
-            Token openQuote = new Token();
+            Token openQuote = new Token(lineNumber);
             openQuote.setLexeme(String.valueOf(matched.charAt(0)));
             openQuote.setLexeme("String delimiter");
 
-            Token closeQuote = new Token();
+            Token closeQuote = new Token(lineNumber);
             closeQuote.setLexeme(String.valueOf(matched.charAt(matched.length() - 1)));
             closeQuote.setLexeme("String delimiter");
 
@@ -191,6 +197,7 @@ public class Lexer {
         }
 
         this.tokens.add(token);
+        this.stringLine.add(token);
     }
 
     // This is for debugging only
@@ -211,6 +218,10 @@ public class Lexer {
 
     ObservableList<Token> getTokens() {
         return this.tokens;
+    }
+
+    SyntaxAnalyzer getSa() {
+        return this.syntax;
     }
 
 

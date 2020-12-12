@@ -8,6 +8,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -19,7 +20,6 @@ public class Controller {
     static Stage stage;
     Lexer lexer = new Lexer();
 
-    // ---- HPPL -----
     // Kung gagamit kayo ng ubject galing sa UI, iname niyo muna yung ID niya.
     // After that, reference niyo siya gamit @FXML para maaaccess siya sa code.
     // Example: Yung TextFlow sa code na Pane. Nireference ko muna siya gamit @FXML
@@ -32,6 +32,9 @@ public class Controller {
     private TableColumn<Token, String> lexCol;
     @FXML
     private TableColumn<Token, String> classCol;
+
+    @FXML
+    private TextFlow textOutput;
 
     // When load button is clicked, it will open a new windows
     // and lets the user choose a lol code file
@@ -63,6 +66,7 @@ public class Controller {
             lexer.readLines();
             //lexer.printTokens();
             setLexemeTable();
+
         }
     }
 

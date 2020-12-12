@@ -79,7 +79,7 @@
                          <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="1322.0" text="Execute" />
                         <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="1322.0">
                            <content>
-                              <TextFlow fx:id="textflow" prefHeight="200.0" prefWidth="1322.0" />
+                              <TextFlow fx:id="textOutput" prefHeight="200.0" prefWidth="1322.0" />
                            </content>
                         </ScrollPane>
                      </children>
