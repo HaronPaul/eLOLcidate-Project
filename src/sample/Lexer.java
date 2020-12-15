@@ -3,6 +3,8 @@ package sample;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TextArea;
+
+import java.awt.desktop.SystemSleepEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -16,6 +18,7 @@ public class Lexer {
     ObservableList<Token> tokens = FXCollections.observableArrayList();
     ArrayList<Token> stringLine;
     TextArea codePane;
+    String subline;
 
 
     // This is for checking if the lexeme is BTW or OBTW
@@ -53,7 +56,7 @@ public class Lexer {
                 else {
                     matchStrings(line, lineNum);
                     //this.syntax.checkSyntax(this.stringLine, lineNum);
-                    //stringLine.clear();
+                    stringLine.clear();
                 }
                 line = reader.readLine();
                 lineNum++;
@@ -69,10 +72,11 @@ public class Lexer {
     // Regex part. This is where the keywords, strings,
     // and identifiers are matched
     void matchStrings(String line, int lineNum) {
-        String subline = line;
+        this.subline = line.trim();
+        boolean flag = true;
 
         // Regex for the keywords
-        Pattern keyword = Pattern.compile("(^I|\\bI)\\sHAS\\s(A$|A\\b)|(^H|\\bH)A(I$|I\\b)|(^K|\\bK)" +
+        Pattern keyword = Pattern.compile("(^B|\\bB)T(W$|W\\b)|(^I|\\bI)\\sHAS\\s(A$|A\\b)|(^H|\\bH)A(I$|I\\b)|(^K|\\bK)" +
                 "THXBY(E$|E\\b)|(^V|\\bV)ISIBL(E$|E\\b)|(^D|\\bD)IFF O(F$|F\\b)|(^S|\\bS)UM O" +
                 "(F$|F\\b)|" +
                 "(^P|\\bP)RODUKT O(F$|F\\b)|(^Q|\\bQ)UOSHUNT O(F$|F\\b)|(^M|\\bM)OD\\sO(F$|F\\b)|" +
@@ -83,23 +87,42 @@ public class Lexer {
                 "(^O|\\bO)MG WT(F$|F\\b)|(^A|\\bA)(N$|N\\b)|(^O|\\bO)\\sRLY(\\?$|\\?\\b)|(^Y|\\bY)" +
                 "A RL(Y$|Y\\b)|(^M|\\bM)EBB(E$|E\\b)|(^N|\\bN)O WA(I$|I\\b)|(^O|\\bO)I(C$|C\\b)|" +
                 "(^I|\\bI)T(Z$|Z\\b)|(^B|\\bB)OTH SAE(M$|M\\b)|(^D|\\bD)IFFRIN(T$|T\\b)|(^G|\\bG)" +
-                "IMME(H$|H\\b)|(^S|\\bS)MOOS(H$|H\\b)|\\sR\\s|(^B|\\bB)T(W$|W\\b)|(^N|\\bN)UMB(R$|R\\b)|(^N|\\bN)UMBA" +
+                "IMME(H$|H\\b)|(^S|\\bS)MOOS(H$|H\\b)|\\sR|(^N|\\bN)UMB(R$|R\\b)|(^N|\\bN)UMBA" +
                 "(R$|R\\b)|(^T|\\bT)ROO(F$|F\\b)|(^Y|\\bY)AR(N$|N\\b)");
 
 
-        Matcher m = keyword.matcher(subline);
+        Matcher m = keyword.matcher(this.subline);
         // This returns all the matched keywords from the line
-        while(m.find()) {
-            String matched = m.group().trim();
 
+        while(m.find()) {
+            String matched = m.group();
             // This removes the matched keyword in the line so that it will not be
             // identified as a variable identifier later on.
-            subline = subline.replace(matched, "").trim();
 
             // When the matched keyword is BTW, it will ignore the
             // rest of the words in the line and proceed to next line
             if(matched.equals("BTW")) {
-                return;
+                int start = this.subline.indexOf(matched);
+
+                // This will convert the the subline string to an arracy of characters for
+                // character checking
+                char[] newString = this.subline.toCharArray();
+
+                try {
+
+                    // When it encounters BTW, it replaces all the strings with a space
+                    while(start != this.subline.length()) {
+                        newString[start] = ' ';
+                        start++;
+                    }
+
+                    // converts the array of chars to a single stirng
+                    this.subline = String.valueOf(newString);
+
+                } catch (Exception e) {
+                    System.out.print("");
+                }
+
             }
 
             // If keyword is OBTW, it ignores the succeeding lines until it encounters
@@ -113,11 +136,52 @@ public class Lexer {
             // lexemes
             else if(matched.equals("TLDR")) {
                 this.isComment = false;
-                break;
+                return;
             }
 
-            if(!this.isComment)
-                addLexeme(matched, "keyword", lineNum);
+            // If lexeme is not within comment block, it will add the lexeme
+            // to the tokens list
+            if(!this.isComment) {
+
+                // If the keyword is BTW, it proceeds to the next matched keyword.
+                // It will not proceed to the succeeding lines
+                if(matched.equals("BTW")) {
+                    continue;
+                }
+
+
+                // startInd is the starting index of the matched keyword in the string 'subline'
+                // endInd is the end Index of the index of the matched keyword in the string 'subline'
+                int startInd = this.subline.indexOf(matched.trim());
+                int endInd = startInd + (matched.length() - 1);
+
+                // String to char array
+                char[] newString = this.subline.toCharArray();
+
+                try {
+
+                    // If the end index == length of subline (means that it is the last word of the statement)
+                    // or if the next character of a string is space, then it will replace the words with a space
+                    if(endInd == this.subline.length() - 1 || newString[endInd + 1] == ' ') {
+                        for(int i=startInd;i<endInd + 1;i++) {
+                            newString[i] = ' ';
+                        }
+                    }
+
+                    // char array to single string
+                    this.subline = String.valueOf(newString);
+
+                    // for adding the lexeme to the tokens list
+                    addLexeme(matched, "keyword", lineNum, startInd);
+
+                } catch(Exception e) {
+                    System.out.println(matched + "Out of bounds");
+                    addLexeme(matched, "keyword", lineNum, startInd);
+                }
+
+
+            }
+
         }
 
         // If line is in comment part, it will not continue
@@ -128,10 +192,24 @@ public class Lexer {
         // Regex for string
         Pattern string = Pattern.compile("\\B\"[^\"]*\"\\B");
         Matcher s = string.matcher(subline);
+
         while (s.find()) {
+            // This is the matched string
             String matchedString = s.group().trim();
-            addLexeme(matchedString, "string", lineNum);
-            subline = subline.replace(matchedString, "").trim();
+
+            // startInd is the starting index of the matched keyword in the string 'subline'
+            // endInd is the end Index of the index of the matched keyword in the string 'subline'
+            int startInd = this.subline.indexOf(matchedString);
+            int endInd = startInd + (matchedString.length() - 1);
+
+            // string to char array
+            char[] newString = this.subline.toCharArray();
+            for(int i=startInd;i<(endInd + 1);i++) {
+                newString[i] = ' ';
+            }
+
+            this.subline = String.valueOf(newString);
+            addLexeme(matchedString, "string", lineNum, startInd);
         }
 
         // Regex for variables identifier
@@ -139,36 +217,62 @@ public class Lexer {
         Matcher v = varident.matcher(subline);
         while(v.find()) {
             // Trimming the leading and trailing whitespaces of the line
+            boolean hasSymbol = false;
             String matchedId = v.group().trim();
 
-            // This adds the matched lexeme to the tokens ObservableArrayList
-            addLexeme(matchedId, "id", lineNum);
-            matchedId = "\\b(" + matchedId + ")\\b";
+            int startInd = this.subline.indexOf(matchedId);
+            int endInd = startInd + (matchedId.length() - 1);
 
-            // This removes the matched identifier in the line
-            subline = subline.replaceAll(matchedId, "").trim();
+            char[] newString = this.subline.toCharArray();
+
+            try {
+                if (newString[endInd + 1] == ' ' || newString[endInd + 1] == '\t') {
+                    for (int i = startInd; i < (endInd + 1); i++) {
+                        newString[i] = ' ';
+                    }
+                    addLexeme(matchedId, "id", lineNum, startInd);
+                }
+
+            } catch(Exception e) {
+                System.out.print("");
+                for (int i = startInd; i < (endInd + 1); i++) {
+                    newString[i] = ' ';
+                }
+                addLexeme(matchedId, "id", lineNum, startInd);
+            }
+
+            this.subline = String.valueOf(newString);
         }
 
         // Regex for numbers
         Pattern number = Pattern.compile("(^-?[0-9]| -?[0-9])[0-9]*\\.?[0-9]*\\b");
         Matcher n = number.matcher(subline);
         while(n.find()) {
+
             // Trimming the leading and trailing whitespaces of the line
             String matchedNum = n.group().trim();
-            addLexeme(matchedNum, "number", lineNum);
-            matchedNum = "\\b" + matchedNum + "\\b";
 
-            //Removing the matched numbers in the line
-            subline = subline.replaceAll(matchedNum, "").trim();
+            int startInd = this.subline.indexOf(matchedNum);
+            int endInd = startInd + (matchedNum.length() - 1);
+
+            char[] newString = this.subline.toCharArray();
+            for(int i=startInd;i<(endInd + 1);i++) {
+                newString[i] = ' ';
+            }
+
+            this.subline = String.valueOf(newString);
+            addLexeme(matchedNum, "number", lineNum, startInd);
         }
+
+        System.out.println(this.subline);
     }
 
     // This functions adds the token to the list
-    void addLexeme(String matched, String type, int lineNumber) {
+    void addLexeme(String matched, String type, int lineNumber, int lineColumn) {
 
         // Cerates a new token
-        Token token = new Token(lineNumber);
-        token.setLexeme(matched);
+        Token token = new Token(lineNumber, lineColumn);
+        token.setLexeme(matched.trim());
 
         // When lexeme is a keyword, it will then classify what type of keyword
         if(type.equals("keyword")) {
@@ -197,7 +301,7 @@ public class Lexer {
                 token.setType("String Concatenation");
             else if (matched.equals("OBTW") || matched.equals("TLDR") || matched.equals("BTW"))
                 token.setType("Comment Delimiter");
-            else if (matched.equals("R"))
+            else if (matched.trim().equals("R"))
                 token.setType("Assignment Operation");
             else if (matched.equals("NUMBR") || matched.equals("NUMBAR") || matched.equals("TROOF") || matched.equals(
                     "YARN"))
@@ -209,15 +313,16 @@ public class Lexer {
             }
         }
 
+
         // If lexeme is a string, it will get the double quotes as delimiters and stores the string as a literal
         else if(type.equals("string")) {
             // This creates a new token for opening double quotes
-            Token openQuote = new Token(lineNumber);
+            Token openQuote = new Token(lineNumber, lineColumn);
             openQuote.setLexeme(String.valueOf(matched.charAt(0)));
             openQuote.setLexeme("String delimiter");
 
             // This creates a new token for closing double quotes
-            Token closeQuote = new Token(lineNumber);
+            Token closeQuote = new Token(lineNumber, lineColumn);
             closeQuote.setLexeme(String.valueOf(matched.charAt(matched.length() - 1)));
             closeQuote.setLexeme("String delimiter");
 
@@ -238,14 +343,19 @@ public class Lexer {
 
         // Adding the token to the list
         this.tokens.add(token);
-        this.stringLine.add(token);
+        sortLine(token);
     }
+
 
     // This is for debugging only
     void printTokens() {
         for(Token t: this.tokens) {
             System.out.println(t.lexemeProperty().getValue() + " " + t.typeProperty().getValue());
         }
+    }
+
+    void sortLine(Token token) {
+        this.stringLine.add(token);
     }
 
     // Setter for the LOL code passed from the Controller class
@@ -260,7 +370,5 @@ public class Lexer {
     ObservableList<Token> getTokens() {
         return this.tokens;
     }
-
-
 
 }

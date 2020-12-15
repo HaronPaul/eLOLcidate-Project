@@ -7,9 +7,11 @@ public class Token {
     SimpleStringProperty lexeme;
     SimpleStringProperty type;
     int lineNum;
+    int lineCol;
 
-    public Token(int lineNumber) {
+    public Token(int lineNumber, int lineColumn) {
         this.lineNum = lineNumber;
+        this.lineCol = lineColumn;
     }
 
     void setLexeme(String l) {
@@ -38,5 +40,9 @@ public class Token {
 
     public String getType() {
         return type.get();
+    }
+
+    public int getLineCol() {
+        return this.lineCol;
     }
 }
