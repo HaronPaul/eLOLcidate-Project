@@ -35,4 +35,8 @@ public class Token {
     public String getLexeme() {
         return lexeme.get();
     }
+
+    public String getType() {
+        return type.get();
+    }
 }
