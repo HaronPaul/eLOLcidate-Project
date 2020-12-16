@@ -8,6 +8,9 @@ public class Token {
     SimpleStringProperty type;
     int lineNum;
     int lineCol;
+    String literalType;
+    String value;
+
 
     public Token(int lineNumber, int lineColumn) {
         this.lineNum = lineNumber;
@@ -45,4 +48,13 @@ public class Token {
     public int getLineCol() {
         return this.lineCol;
     }
+
+    public void setLiteralType(String litType) {
+        this.literalType = litType;
+    }
+
+    public void setValue(String v) {
+        this.value = v;
+    }
+
 }

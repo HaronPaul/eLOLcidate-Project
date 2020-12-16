@@ -59,10 +59,10 @@
                                    <Font size="18.0" />
                                </font>
                            </Text>
-                           <TableView prefHeight="464.0" prefWidth="414.0">
+                           <TableView fx:id="symbolTable" prefHeight="464.0" prefWidth="414.0">
                                <columns>
-                                   <TableColumn prefWidth="113.0" text="Identifier" />
-                                   <TableColumn prefWidth="117.0" text="Value" />
+                                   <TableColumn fx:id="identCol" prefWidth="113.0" text="Identifier" />
+                                   <TableColumn fx:id="valCol" prefWidth="117.0" text="Value" />
                                </columns>
                                 <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -76,8 +76,8 @@
                <children>
                   <VBox>
                      <children>
-                         <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="1322.0" text="Execute" />
-                        <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="1322.0">
+                         <Button mnemonicParsing="false" onAction="#clickExecute" prefHeight="40.0" prefWidth="1322.0" text="Execute" />
+                        <ScrollPane fx:id="executeButton" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="1322.0">
                            <content>
                               <TextFlow fx:id="textOutput" prefHeight="200.0" prefWidth="1322.0" />
                            </content>

@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +21,7 @@ public class Lexer {
     ArrayList<Token> stringLine;
     TextArea codePane;
     String subline;
+    SyntaxAnalyzer syntax;
 
 
     // This is for checking if the lexeme is BTW or OBTW
@@ -27,6 +30,7 @@ public class Lexer {
     // Constructor for Lexer class
     public Lexer() {
         this.stringLine = new ArrayList<Token>();
+        this.syntax = new SyntaxAnalyzer();
     }
 
     public void readLines() {
@@ -55,7 +59,8 @@ public class Lexer {
                 }
                 else {
                     matchStrings(line, lineNum);
-                    //this.syntax.checkSyntax(this.stringLine, lineNum);
+                    sortStringLine();
+                    this.syntax.checkSyntax(stringLine, lineNum);
                     stringLine.clear();
                 }
                 line = reader.readLine();
@@ -66,7 +71,7 @@ public class Lexer {
             e.printStackTrace();
         }
 
-        //this.syntax.printErrors();
+        this.syntax.printErrors();
     }
 
     // Regex part. This is where the keywords, strings,
@@ -109,7 +114,6 @@ public class Lexer {
                 char[] newString = this.subline.toCharArray();
 
                 try {
-
                     // When it encounters BTW, it replaces all the strings with a space
                     while(start != this.subline.length()) {
                         newString[start] = ' ';
@@ -153,13 +157,11 @@ public class Lexer {
                 // startInd is the starting index of the matched keyword in the string 'subline'
                 // endInd is the end Index of the index of the matched keyword in the string 'subline'
                 int startInd = this.subline.indexOf(matched.trim());
-                int endInd = startInd + (matched.length() - 1);
+                int endInd = startInd + (matched.trim().length() - 1);
 
                 // String to char array
                 char[] newString = this.subline.toCharArray();
-
                 try {
-
                     // If the end index == length of subline (means that it is the last word of the statement)
                     // or if the next character of a string is space, then it will replace the words with a space
                     if(endInd == this.subline.length() - 1 || newString[endInd + 1] == ' ') {
@@ -178,10 +180,7 @@ public class Lexer {
                     System.out.println(matched + "Out of bounds");
                     addLexeme(matched, "keyword", lineNum, startInd);
                 }
-
-
             }
-
         }
 
         // If line is in comment part, it will not continue
@@ -217,7 +216,6 @@ public class Lexer {
         Matcher v = varident.matcher(subline);
         while(v.find()) {
             // Trimming the leading and trailing whitespaces of the line
-            boolean hasSymbol = false;
             String matchedId = v.group().trim();
 
             int startInd = this.subline.indexOf(matchedId);
@@ -331,21 +329,19 @@ public class Lexer {
             token.setLexeme(matched.replaceAll("\"", ""));
 
             token.setType("Literal");
-
             // When lexeme is of type identifier
         } else if(type.equals("id")) {
             token.setType("Identifier");
-
             // When lexeme is of type number
         } else if(type.equals("number")) {
             token.setType("Literal");
         }
 
+
         // Adding the token to the list
         this.tokens.add(token);
-        sortLine(token);
+        this.stringLine.add(token);
     }
-
 
     // This is for debugging only
     void printTokens() {
@@ -354,8 +350,19 @@ public class Lexer {
         }
     }
 
-    void sortLine(Token token) {
-        this.stringLine.add(token);
+    void sortStringLine() {
+        Collections.sort(this.stringLine, new Comparator<Token>() {
+            @Override
+            public int compare(Token o1, Token o2) {
+                if(o1.getLineCol() > o2.getLineCol()) {
+                    return 1;
+                }
+                if(o1.getLineCol() < o2.getLineCol()) {
+                    return -1;
+                }
+                return 0;
+            }
+        });
     }
 
     // Setter for the LOL code passed from the Controller class
@@ -369,6 +376,10 @@ public class Lexer {
 
     ObservableList<Token> getTokens() {
         return this.tokens;
+    }
+
+    SyntaxAnalyzer getSyntax() {
+        return this.syntax;
     }
 
 }

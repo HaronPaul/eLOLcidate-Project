@@ -8,6 +8,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -32,6 +36,7 @@ public class Controller {
     private TableColumn<Token, String> lexCol;
     @FXML
     private TableColumn<Token, String> classCol;
+    
 
     @FXML
     private TextFlow textOutput;
@@ -66,7 +71,6 @@ public class Controller {
             lexer.readLines();
             //lexer.printTokens();
             setLexemeTable();
-
         }
     }
 
@@ -76,6 +80,27 @@ public class Controller {
         this.lexCol.setCellValueFactory(new PropertyValueFactory<Token, String>("lexeme"));
         this.classCol.setCellValueFactory(new PropertyValueFactory<Token, String>("type"));
         this.lexTable.setItems(this.lexer.getTokens());
+    }
+
+    @FXML
+    void clickExecute() {
+        System.out.print("Clicked Execute");
+        SyntaxAnalyzer syntax = this.lexer.getSyntax();
+
+        if(syntax.getSyntaxErrors().size() > 0) {
+            for(int i=0;i<syntax.getSyntaxErrors().size();i++) {
+                String err = syntax.getLineErrors().get(i) + syntax.getSyntaxErrors().get(i);
+                Text t = new Text(err);
+                t.setFill(Color.RED);
+                t.setFont(Font.font("Verdana", FontWeight.BOLD, 14));
+                this.textOutput.getChildren().add(t);
+            }
+        } else {
+            for(String s: syntax.getOutputs()) {
+                Text t = new Text(s);
+                this.textOutput.getChildren().add(t);
+            }
+        }
     }
 
     // This references the stage from the main class
