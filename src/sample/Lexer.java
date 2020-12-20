@@ -272,7 +272,6 @@ public class Lexer {
 
     // This functions adds the token to the list
     void addLexeme(String matched, String type, int lineNumber, int lineColumn, ArrayList<Token> stringLine) {
-
         // Cerates a new token
         Token token = new Token(lineNumber, lineColumn);
         token.setLexeme(matched.trim());
@@ -333,7 +332,7 @@ public class Lexer {
 
             // This removes the double quotes of the string, storing only the string inside the
             // double quotes
-            token.setLexeme(matched.replaceAll("\"", ""));
+            // token.setLexeme(matched.replaceAll("\"", ""));
             token.setType("Literal");
 
             // When lexeme is of type identifier

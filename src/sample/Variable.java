@@ -7,14 +7,17 @@ public class Variable {
     SimpleStringProperty varName;
     SimpleStringProperty value;
     boolean isInitialized;
-    String type;
+    String datatype;
+    boolean isYARN;
+    boolean isNUMBR;
+    boolean isNUMBAR;
+    boolean isTROOF;
 
 
     public Variable() {
         this.isInitialized = false;
         if(!this.isInitialized) {
-            this.type = "NOOB";
-            this.type = "NULL";
+            this.datatype = "NOOB";
         }
     }
 
@@ -30,7 +33,15 @@ public class Variable {
     }
 
     void setType(String type) {
-        this.type = type;
+        this.datatype = type;
+        if(type.equals("NUMBR"))
+            this.isNUMBR = true;
+        else if(type.equals("NUMBAR"))
+            this.isNUMBAR = true;
+        else if(type.equals("TROOF"))
+            this.isTROOF = true;
+        else
+            this.isYARN = true;
     }
 
     String getVarName() {
@@ -40,6 +51,7 @@ public class Variable {
     String getValue() {
         return this.value.get();
     }
+    String getDatatype() {return this.datatype; }
 
 
 }
