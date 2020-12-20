@@ -9,7 +9,6 @@ public class Token {
     int lineNum;
     int lineCol;
     String literalType;
-    String value;
 
 
     public Token(int lineNumber, int lineColumn) {
@@ -52,9 +51,4 @@ public class Token {
     public void setLiteralType(String litType) {
         this.literalType = litType;
     }
-
-    public void setValue(String v) {
-        this.value = v;
-    }
-
 }

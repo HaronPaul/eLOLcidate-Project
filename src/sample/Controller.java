@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class Controller {
@@ -40,6 +41,13 @@ public class Controller {
 
     @FXML
     private TextFlow textOutput;
+
+    @FXML
+    private TableView<Variable> symbolTable;
+    @FXML
+    private TableColumn<Variable, String> identCol;
+    @FXML
+    private TableColumn<Variable, String> valCol;
 
     // When load button is clicked, it will open a new windows
     // and lets the user choose a lol code file
@@ -67,6 +75,7 @@ public class Controller {
         // Passing the LOL code to the lexer
         if(selectedFile != null) {
             codePane.clear();
+            lexer.setTextOutput(textOutput);
             lexer.setLolFile(selectedFile);
             lexer.readLines();
             //lexer.printTokens();
@@ -84,27 +93,50 @@ public class Controller {
 
     @FXML
     void clickExecute() {
+        this.symbolTable.getItems().clear();
         System.out.print("Clicked Execute");
         SyntaxAnalyzer syntax = this.lexer.getSyntax();
+        syntax.setTextOutput(textOutput);
 
-        if(syntax.getSyntaxErrors().size() > 0) {
-            for(int i=0;i<syntax.getSyntaxErrors().size();i++) {
-                String err = syntax.getLineErrors().get(i) + syntax.getSyntaxErrors().get(i);
-                Text t = new Text(err);
-                t.setFill(Color.RED);
-                t.setFont(Font.font("Verdana", FontWeight.BOLD, 14));
-                this.textOutput.getChildren().add(t);
+        int ind = 0;
+        for(ArrayList<Token> line : syntax.getLines()) {
+            int lineNum = this.lexer.getLineNumbers().get(ind);
+            syntax.checkSyntax(line, lineNum);
+            if(syntax.getSyntaxErrors().size() > 0) {
+                printSyntaxErrors(syntax);
+                break;
             }
-        } else {
-            for(String s: syntax.getOutputs()) {
-                Text t = new Text(s);
-                this.textOutput.getChildren().add(t);
-            }
+            ind++;
         }
+        if(syntax.getSyntaxErrors().size() == 0)
+            addToSymbolTable(syntax);
+
+        syntax.getSyntaxErrors().clear();
+        syntax.getLineErrors().clear();
     }
 
     // This references the stage from the main class
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    void printSyntaxErrors(SyntaxAnalyzer syntax) {
+        for(int i=0;i<syntax.getSyntaxErrors().size();i++) {
+            String err = syntax.getLineErrors().get(i) + syntax.getSyntaxErrors().get(i);
+            Text t = new Text(err);
+            t.setFill(Color.RED);
+            t.setFont(Font.font("Verdana", FontWeight.BOLD, 14));
+            this.textOutput.getChildren().add(t);
+        }
+    }
+
+    void addToSymbolTable(SyntaxAnalyzer syntax) {
+        for(Variable v: syntax.getVariables()) {
+            System.out.println(v.getVarName());
+        }
+
+        this.identCol.setCellValueFactory(new PropertyValueFactory<Variable, String>("varName"));
+        this.valCol.setCellValueFactory(new PropertyValueFactory<Variable, String>("value"));
+        this.symbolTable.setItems(syntax.getVariables());
     }
 }

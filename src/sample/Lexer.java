@@ -3,8 +3,8 @@ package sample;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TextArea;
+import javafx.scene.text.TextFlow;
 
-import java.awt.desktop.SystemSleepEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -18,19 +18,21 @@ import java.util.regex.Pattern;
 public class Lexer {
     File lolFile;
     ObservableList<Token> tokens = FXCollections.observableArrayList();
-    ArrayList<Token> stringLine;
+    ArrayList<ArrayList> lines;
+    ArrayList<Integer> lineNumbers;
     TextArea codePane;
     String subline;
     SyntaxAnalyzer syntax;
-
+    TextFlow textOutput;
 
     // This is for checking if the lexeme is BTW or OBTW
     boolean isComment = false;
 
     // Constructor for Lexer class
     public Lexer() {
-        this.stringLine = new ArrayList<Token>();
         this.syntax = new SyntaxAnalyzer();
+        this.lines = new ArrayList<ArrayList>();
+        this.lineNumbers = new ArrayList<Integer>();
     }
 
     public void readLines() {
@@ -58,25 +60,28 @@ public class Lexer {
                     continue;
                 }
                 else {
-                    matchStrings(line, lineNum);
-                    sortStringLine();
-                    this.syntax.checkSyntax(stringLine, lineNum);
-                    stringLine.clear();
+                    ArrayList<Token> stringLine = new ArrayList<Token>();
+                    this.lineNumbers.add(lineNum);
+                    matchStrings(line, lineNum, stringLine);
+                    sortStringLine(stringLine);
+                    this.lines.add(stringLine);
+                    //this.syntax.checkSyntax(stringLine, lineNum);
                 }
                 line = reader.readLine();
                 lineNum++;
             }
 
+            this.syntax.setLines(this.lines);
         } catch (IOException e){
             e.printStackTrace();
         }
 
-        this.syntax.printErrors();
+
     }
 
     // Regex part. This is where the keywords, strings,
     // and identifiers are matched
-    void matchStrings(String line, int lineNum) {
+    void matchStrings(String line, int lineNum, ArrayList<Token> stringLine) {
         this.subline = line.trim();
         boolean flag = true;
 
@@ -174,11 +179,11 @@ public class Lexer {
                     this.subline = String.valueOf(newString);
 
                     // for adding the lexeme to the tokens list
-                    addLexeme(matched, "keyword", lineNum, startInd);
+                    addLexeme(matched, "keyword", lineNum, startInd, stringLine);
 
                 } catch(Exception e) {
                     System.out.println(matched + "Out of bounds");
-                    addLexeme(matched, "keyword", lineNum, startInd);
+                    addLexeme(matched, "keyword", lineNum, startInd, stringLine);
                 }
             }
         }
@@ -208,7 +213,7 @@ public class Lexer {
             }
 
             this.subline = String.valueOf(newString);
-            addLexeme(matchedString, "string", lineNum, startInd);
+            addLexeme(matchedString, "string", lineNum, startInd, stringLine);
         }
 
         // Regex for variables identifier
@@ -228,7 +233,7 @@ public class Lexer {
                     for (int i = startInd; i < (endInd + 1); i++) {
                         newString[i] = ' ';
                     }
-                    addLexeme(matchedId, "id", lineNum, startInd);
+                    addLexeme(matchedId, "id", lineNum, startInd, stringLine);
                 }
 
             } catch(Exception e) {
@@ -236,7 +241,7 @@ public class Lexer {
                 for (int i = startInd; i < (endInd + 1); i++) {
                     newString[i] = ' ';
                 }
-                addLexeme(matchedId, "id", lineNum, startInd);
+                addLexeme(matchedId, "id", lineNum, startInd, stringLine);
             }
 
             this.subline = String.valueOf(newString);
@@ -259,14 +264,14 @@ public class Lexer {
             }
 
             this.subline = String.valueOf(newString);
-            addLexeme(matchedNum, "number", lineNum, startInd);
+            addLexeme(matchedNum, "number", lineNum, startInd, stringLine);
         }
 
         System.out.println(this.subline);
     }
 
     // This functions adds the token to the list
-    void addLexeme(String matched, String type, int lineNumber, int lineColumn) {
+    void addLexeme(String matched, String type, int lineNumber, int lineColumn, ArrayList<Token> stringLine) {
 
         // Cerates a new token
         Token token = new Token(lineNumber, lineColumn);
@@ -317,18 +322,20 @@ public class Lexer {
             // This creates a new token for opening double quotes
             Token openQuote = new Token(lineNumber, lineColumn);
             openQuote.setLexeme(String.valueOf(matched.charAt(0)));
-            openQuote.setLexeme("String delimiter");
+            openQuote.setType("String delimiter");
+            this.tokens.add(openQuote);
 
             // This creates a new token for closing double quotes
             Token closeQuote = new Token(lineNumber, lineColumn);
             closeQuote.setLexeme(String.valueOf(matched.charAt(matched.length() - 1)));
-            closeQuote.setLexeme("String delimiter");
+            closeQuote.setType("String delimiter");
+            this.tokens.add(closeQuote);
 
             // This removes the double quotes of the string, storing only the string inside the
             // double quotes
             token.setLexeme(matched.replaceAll("\"", ""));
-
             token.setType("Literal");
+
             // When lexeme is of type identifier
         } else if(type.equals("id")) {
             token.setType("Identifier");
@@ -336,11 +343,10 @@ public class Lexer {
         } else if(type.equals("number")) {
             token.setType("Literal");
         }
-
-
+        
         // Adding the token to the list
         this.tokens.add(token);
-        this.stringLine.add(token);
+        stringLine.add(token);
     }
 
     // This is for debugging only
@@ -350,8 +356,8 @@ public class Lexer {
         }
     }
 
-    void sortStringLine() {
-        Collections.sort(this.stringLine, new Comparator<Token>() {
+    void sortStringLine(ArrayList<Token> stringLine) {
+        Collections.sort(stringLine, new Comparator<Token>() {
             @Override
             public int compare(Token o1, Token o2) {
                 if(o1.getLineCol() > o2.getLineCol()) {
@@ -373,6 +379,7 @@ public class Lexer {
     void setCodePane(TextArea tf) {
         this.codePane = tf;
     }
+    void setTextOutput(TextFlow output) {this.textOutput = output;}
 
     ObservableList<Token> getTokens() {
         return this.tokens;
@@ -380,6 +387,10 @@ public class Lexer {
 
     SyntaxAnalyzer getSyntax() {
         return this.syntax;
+    }
+
+    ArrayList<Integer> getLineNumbers() {
+        return this.lineNumbers;
     }
 
 }
