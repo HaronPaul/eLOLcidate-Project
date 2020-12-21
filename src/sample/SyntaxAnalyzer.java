@@ -6,6 +6,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class SyntaxAnalyzer {
     private static Variable IT = new Variable();
@@ -16,6 +17,9 @@ public class SyntaxAnalyzer {
     private ArrayList<String> outputs;
     private ObservableList<Variable> variables;
     private TextFlow textOutput;
+
+    private ArrayList<String> operations;
+    private ArrayList<String> operands;
 
     public SyntaxAnalyzer() {
         this.syntaxErrors = new ArrayList<String>();
@@ -45,14 +49,16 @@ public class SyntaxAnalyzer {
         else if(stringLine.get(0).getLexeme().equals("GIMMEH")) {
             getUserInput(stringLine, lineNumber);
         }
+        else if(stringLine.get(0).getType().equals("Arithmetic Operator")){
+            artihmeticOperation(stringLine, lineNumber);
+        }
         else if(stringLine.get(0).getType().equals("Identifier")) {
             int ind = findVar(stringLine.get(0).getLexeme());
-            if(ind == this.variables.size()) {
+            if (ind == this.variables.size()) {
                 this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
                 this.syntaxErrors.add(stringLine.get(0).getLexeme() + " not defined\n");
                 return;
-            }
-            else {
+            } else {
                 assignVariable(stringLine, lineNumber, ind);
             }
         }
@@ -103,6 +109,7 @@ public class SyntaxAnalyzer {
                             }
                             else {
                                 String datatype = checkVarDatatype(this.variables.get(ind).getValue());
+                                v.isInitialized = true;
                                 v.setType(datatype);
                                 v.setValue(this.variables.get(ind).getValue());
                             }
@@ -111,6 +118,7 @@ public class SyntaxAnalyzer {
                         else if(stringLine.get(3).getType().equals("Literal") || stringLine.get(3).getType().equals(
                                 "Boolean Literal")) {
                             String datatype = checkVarDatatype(stringLine.get(3).getLexeme());
+                            v.isInitialized = true;
                             v.setType(datatype);
                             v.setValue(stringLine.get(3).getLexeme());
                         }
@@ -207,6 +215,7 @@ public class SyntaxAnalyzer {
             if(stringLine.get(2).getType().equals("Literal") || stringLine.get(2).getType().equals("Boolean Literal")) {
                     this.variables.get(varIndex).setType(checkVarDatatype(stringLine.get(2).getLexeme()));
                     this.variables.get(varIndex).setValue(stringLine.get(2).getLexeme());
+                    this.variables.get(varIndex).isInitialized = true;
             }
             else if(stringLine.get(2).getType().equals("Identifier")) {
                 int index = findVar(stringLine.get(2).getLexeme());
@@ -218,12 +227,17 @@ public class SyntaxAnalyzer {
                 else {
                     this.variables.get(varIndex).setType(this.variables.get(index).getDatatype());
                     this.variables.get(varIndex).setValue(this.variables.get(index).getValue());
+                    this.variables.get(varIndex).isInitialized = true;
                 }
             }
             else if(stringLine.get(2).getType().equals("Arithmetic Operator")) {
-                /*
-                Pao insert mo function call dito
-                 */
+                stringLine.remove(0);
+                stringLine.remove(0);
+                artihmeticOperation(stringLine, lineNumber);
+                if(this.syntaxErrors.size() == 0) {
+                    this.variables.get(varIndex).setType(IT.getDatatype());
+                    this.variables.get(varIndex).setValue(IT.getValue());
+                }
             }
             else {
                 this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
@@ -234,38 +248,143 @@ public class SyntaxAnalyzer {
             this.syntaxErrors.add("Needs literal/identifier after R keyword\n");
         }
 
-
-
     }
 
     void artihmeticOperation(ArrayList<Token> stringLine, int lineNumber) {
-        Object operand1;
-        Object operand2;
+        ArrayList<String> operands = new ArrayList<String>();
 
         try {
             if (stringLine.get(1).getType().equals("Literal")) {
-                if(stringLine.get(1).getLexeme().matches("^([1-9][0-9]*)$") || stringLine.get(1).getLexeme().matches("^([1-9][0-9]*\\.[0-9]*)$")) {
-                    /*
-                    Insert code here
-                     */
-
-                }
-                else if(stringLine.get(1).getType().equals("Identifier")) {
-                    System.out.println("Operand is identifier");
-                    /*
-                    Insert code here
-                     */
+                if(stringLine.get(1).getLexeme().matches("^([1-9][0-9]*)$") || stringLine.get(1).getLexeme().matches(
+                        "^([1-9][0-9]*\\.[0-9]*)$")) {
+                    operands.add(stringLine.get(1).getLexeme());
                 }
                 else {
                     this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
                     this.syntaxErrors.add("Expected numeric literal/variable/expression but found " + stringLine.get(1).getType());
+                    return;
+                }
+            }
+            else if(stringLine.get(1).getType().equals("Identifier")) {
+                int varIndex = findVar(stringLine.get(1).getLexeme());
+                // Error checking for undefined variable
+                if(varIndex == this.variables.size()) {
+                    this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
+                    this.syntaxErrors.add(stringLine.get(1).getLexeme() + " not defined");
+                    return;
+                }
+                // Error checking for uninitialized variable
+                else if(!this.variables.get(varIndex).isInitialized) {
+                    this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
+                    this.syntaxErrors.add(stringLine.get(1).getLexeme() + " not yet initialized");
+                    return;
+                }
+                else {
+                    // Error checking for Non-NUMBR/NUMBAR variables
+                    System.out.println("LORENTEEEEE!!!");
+                    if(this.variables.get(varIndex).getValue().matches("^([1-9][0-9]*)$") || this.variables.get(varIndex).getValue().matches(
+                            "^([1-9][0-9]*\\.[0-9]*)$")) {
+                        operands.add(this.variables.get(varIndex).getValue());
+                    }
+                    else {
+                        this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
+                        this.syntaxErrors.add("Value of variable " + stringLine.get(1).getLexeme() + " is not " +
+                                "of type NUMBR/NUMBAR");
+                        return;
+                    }
                 }
             }
         }catch(Exception e){
             this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
-            this.syntaxErrors.add(stringLine.get(0).getLexeme() + " not defined\n");
+            this.syntaxErrors.add("Expected numeric literal/variable/expression");
             return;
         }
+
+        try {
+            if(!stringLine.get(2).getLexeme().equals("AN")) {
+                this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
+                this.syntaxErrors.add("Expected AN keyword but found " + stringLine.get(2).getType());
+                return;
+            }
+        } catch (Exception e) {
+            this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
+            this.syntaxErrors.add("Expected AN keyword");
+        }
+
+        try {
+            if (stringLine.get(3).getType().equals("Literal")) {
+                if(stringLine.get(3).getLexeme().matches("^([1-9][0-9]*)$") || stringLine.get(3).getLexeme().matches(
+                        "^([1-9][0-9]*\\.[0-9]*)$")) {
+                    operands.add(stringLine.get(3).getLexeme());
+                }
+                else if(stringLine.get(3).getType().equals("Identifier")) {
+                    System.out.println("Operand is identifier");
+                }
+                else {
+                    this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
+                    this.syntaxErrors.add("Expected numeric literal/variable/expression but found " + stringLine.get(3).getType());
+                    return;
+                }
+            }
+            else if(stringLine.get(3).getType().equals("Identifier")) {
+                int varIndex = findVar(stringLine.get(3).getLexeme());
+
+                // Error checking for undefined variable
+                if(varIndex == this.variables.size()) {
+                    this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
+                    this.syntaxErrors.add(stringLine.get(3).getLexeme() + " not defined");
+                    return;
+                }
+                // Error checking for uninitialized variable
+                else if(!this.variables.get(varIndex).isInitialized) {
+                    this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
+                    this.syntaxErrors.add(stringLine.get(3).getLexeme() + " not yet initialized");
+                    return;
+                }
+
+                else {
+                    // Error checking for Non-NUMBR/NUMBAR variables
+                    if(this.variables.get(varIndex).getValue().matches("^([1-9][0-9]*)$") || this.variables.get(varIndex).getValue().matches(
+                            "^([1-9][0-9]*\\.[0-9]*)$")) {
+                        operands.add(this.variables.get(varIndex).getValue());
+                    }
+                    else {
+                        this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
+                        this.syntaxErrors.add("Value of variable " + stringLine.get(3).getLexeme() + " is not " +
+                                "of type NUMBR/NUMBAR");
+                        return;
+                    }
+                }
+            } else if(stringLine.get(3).getType().equals("Arithmetic Operator")) {
+
+            }
+        } catch(Exception e) {
+            this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
+            this.syntaxErrors.add("Expected numeric literal/variable/expression");
+        }
+
+        boolean isFloat = false;
+        float sum = 0;
+        for(String number: operands) {
+            if(number.matches("^([1-9][0-9]*)$")) {
+                sum = sum + Integer.parseInt(number);
+            }
+            if(number.matches("^([1-9][0-9]*\\.[0-9]*)$")) {
+                sum = sum + Float.parseFloat(number);
+                isFloat = true;
+            }
+        }
+
+        if(isFloat) {
+            IT.setType("NUMBAR");
+            IT.setValue(Float.toString(sum));
+        }
+        else {
+            IT.setType("NUMBR");
+            IT.setValue(Integer.toString((int) sum));
+        }
+
+        System.out.println("Value of IT" + IT.getValue());
     }
 
 
