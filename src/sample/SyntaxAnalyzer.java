@@ -62,6 +62,30 @@ public class SyntaxAnalyzer {
                 assignVariable(stringLine, lineNumber, ind);
             }
         }
+        else if(stringLine.get(0).getType().equals("Code Delimiter")) {
+            programCheck(stringLine, lineNumber);
+        }
+    }
+
+    void programCheck(ArrayList<Token> stringLine, int lineNumber) {
+        boolean validProg = true;
+        try {
+            if (!stringLine.get(1).getType().equals("Code Delimiter")) {
+                this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
+                this.syntaxErrors.add("Error in code " + stringLine.get(1).getType() + "\n");
+                validProg = false;
+                return;
+            }
+
+            if (validProg) {
+//                if(stringLine.size() > 2) {
+                    if(!stringLine.get(2).getLexeme().equals("HAI") && stringLine.get(2).getType().equals("KTHXBYE")){
+                        String datatype = checkHAIKTHX(stringLine.get(3).getLexeme());
+                    }
+//                }
+            }
+
+        }catch(IndexOutOfBoundsException e){}
     }
 
     void checkVarDeclaration(ArrayList<Token> stringLine, int lineNumber) {
@@ -99,7 +123,7 @@ public class SyntaxAnalyzer {
                         return;
                     }
                     try {
-                        // When the initialozed value is a variable
+                        // When the initialized value is a variable
                         if(stringLine.get(3).getType().equals("Identifier")) {
                             int ind = findVar(stringLine.get(3).getLexeme());
                             if(ind == this.variables.size()) {
@@ -213,9 +237,9 @@ public class SyntaxAnalyzer {
 
         try {
             if(stringLine.get(2).getType().equals("Literal") || stringLine.get(2).getType().equals("Boolean Literal")) {
-                    this.variables.get(varIndex).setType(checkVarDatatype(stringLine.get(2).getLexeme()));
-                    this.variables.get(varIndex).setValue(stringLine.get(2).getLexeme());
-                    this.variables.get(varIndex).isInitialized = true;
+                this.variables.get(varIndex).setType(checkVarDatatype(stringLine.get(2).getLexeme()));
+                this.variables.get(varIndex).setValue(stringLine.get(2).getLexeme());
+                this.variables.get(varIndex).isInitialized = true;
             }
             else if(stringLine.get(2).getType().equals("Identifier")) {
                 int index = findVar(stringLine.get(2).getLexeme());
@@ -417,6 +441,22 @@ public class SyntaxAnalyzer {
         return datatype;
     }
 
+//    int findHAIKTHX (String keyName) {
+//        int index = 0;
+//        for (Variable
+//    }
+
+    //checks if yung keyword like hai and kthx ay nandon
+    String checkHAIKTHX(String literal) {
+        String datatype = "KEYWORD";
+        if(literal.matches("^HAI$"))
+            datatype = "HAI";
+        if(literal.matches("^KTHXBYE$"))
+            datatype = "KTHXBYE";
+
+        return datatype;
+    }
+
     /*
     Setters and Getters
      */
@@ -434,10 +474,10 @@ public class SyntaxAnalyzer {
     }
 
     void printErrors() {
-       for(int i=0;i<this.syntaxErrors.size();i++) {
-           System.out.print("In line " + this.lineErrors.get(i) + ": ");
-           System.out.println(this.syntaxErrors.get(i));
-       }
+        for(int i=0;i<this.syntaxErrors.size();i++) {
+            System.out.print("In line " + this.lineErrors.get(i) + ": ");
+            System.out.println(this.syntaxErrors.get(i));
+        }
     }
 
     void setTextOutput(TextFlow output) {
