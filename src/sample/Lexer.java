@@ -322,17 +322,17 @@ public class Lexer {
             Token openQuote = new Token(lineNumber, lineColumn);
             openQuote.setLexeme(String.valueOf(matched.charAt(0)));
             openQuote.setType("String delimiter");
-            this.tokens.add(openQuote);
+            this.tokens.add(openQuote); //to keep the string delimiters sa lexer
 
             // This creates a new token for closing double quotes
             Token closeQuote = new Token(lineNumber, lineColumn);
             closeQuote.setLexeme(String.valueOf(matched.charAt(matched.length() - 1)));
             closeQuote.setType("String delimiter");
-            this.tokens.add(closeQuote);
+            this.tokens.add(closeQuote); //to keep the string delimiters sa lexer
 
             // This removes the double quotes of the string, storing only the string inside the
             // double quotes
-            // token.setLexeme(matched.replaceAll("\"", ""));
+            token.setLexeme(matched.replaceAll("\"", "")); //uncommented para sa execute walang delimiter yung var
             token.setType("Literal");
 
             // When lexeme is of type identifier
@@ -342,7 +342,7 @@ public class Lexer {
         } else if(type.equals("number")) {
             token.setType("Literal");
         }
-        
+
         // Adding the token to the list
         this.tokens.add(token);
         stringLine.add(token);
