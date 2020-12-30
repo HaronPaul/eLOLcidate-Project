@@ -1,5 +1,7 @@
-eLOLcidate:
+Group Name: eLOLcidate
+Lab Section: T-1L
 
-Bongalon, Ressa Mae P.
-Lorente, Haron Paul P.
-Cortez, Johann Paola P.
+Contributors:
+  Ressa Mae P. Bongalon
+  Johann Paola P. Cortez
+  Haron Paul P. Lorente
