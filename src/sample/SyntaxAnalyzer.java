@@ -40,6 +40,9 @@ public class SyntaxAnalyzer {
                 this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
             }
         }
+//        else if (stringLine.get(0).getType().equals("Code Delimiter")) {
+//            programCheck(stringLine, lineNumber);
+//        }
         else if(stringLine.get(0).getLexeme().equals("I HAS A")) {
             checkVarDeclaration(stringLine, lineNumber);
         }
@@ -62,30 +65,6 @@ public class SyntaxAnalyzer {
                 assignVariable(stringLine, lineNumber, ind);
             }
         }
-        else if(stringLine.get(0).getType().equals("Code Delimiter")) {
-            programCheck(stringLine, lineNumber);
-        }
-    }
-
-    void programCheck(ArrayList<Token> stringLine, int lineNumber) {
-        boolean validProg = true;
-        try {
-            if (!stringLine.get(1).getType().equals("Code Delimiter")) {
-                this.lineErrors.add("In line " + Integer.toString(lineNumber) + ": ");
-                this.syntaxErrors.add("Error in code " + stringLine.get(1).getType() + "\n");
-                validProg = false;
-                return;
-            }
-
-            if (validProg) {
-//                if(stringLine.size() > 2) {
-                    if(!stringLine.get(2).getLexeme().equals("HAI") && stringLine.get(2).getType().equals("KTHXBYE")){
-                        String datatype = checkHAIKTHX(stringLine.get(3).getLexeme());
-                    }
-//                }
-            }
-
-        }catch(IndexOutOfBoundsException e){}
     }
 
     void checkVarDeclaration(ArrayList<Token> stringLine, int lineNumber) {
@@ -159,6 +138,20 @@ public class SyntaxAnalyzer {
             }
         }catch (IndexOutOfBoundsException e) {}
     }
+
+//    void programCheck(ArrayList<Token> stringLine, int lineNumber) {
+//        stringLine.remove(0);
+//        String print = "";
+//        Token t = stringLine.get(0);
+//        //System.out.println("HELLO" + t);
+//        Token z = stringLine.get(stringLine.size()-1);
+//        if (t.equals("HAI") && z.equals("KTHXBYE")){
+//            System.out.println("");
+//        }else{
+//            this.syntaxErrors.add("ERROR" + "\n");
+//        }
+//
+//    }
 
 
     void addtoOutput(ArrayList<Token> stringLine, int lineNumber) {
@@ -441,21 +434,17 @@ public class SyntaxAnalyzer {
         return datatype;
     }
 
-//    int findHAIKTHX (String keyName) {
-//        int index = 0;
-//        for (Variable
-//    }
 
     //checks if yung keyword like hai and kthx ay nandon
-    String checkHAIKTHX(String literal) {
-        String datatype = "KEYWORD";
-        if(literal.matches("^HAI$"))
-            datatype = "HAI";
-        if(literal.matches("^KTHXBYE$"))
-            datatype = "KTHXBYE";
-
-        return datatype;
-    }
+//    String checkHAIKTHX(String literal) {
+//        String datatype = "KEYWORD";
+//        if(literal.matches("^HAI$"))
+//            datatype = "HAI";
+//        if(literal.matches("^KTHXBYE$"))
+//            datatype = "KTHXBYE";
+//
+//        return datatype;
+//    }
 
     /*
     Setters and Getters
